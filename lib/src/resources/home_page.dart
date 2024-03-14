@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:the_wall_app/src/components/drawer.dart';
 import 'package:the_wall_app/src/components/postMsg.dart';
 import 'package:the_wall_app/src/components/textfiled.dart';
+import 'package:the_wall_app/src/resources/profile_page.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +19,16 @@ class _HomePageState extends State<HomePage> {
 
   void signOut() {
     FirebaseAuth.instance.signOut();
+  }
+
+  void goToProfilePage() {
+    Navigator.pop(context);
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => const ProfilePage(),
+      ),
+    );
   }
 
   void displayMessage(String message) {
@@ -48,20 +60,17 @@ class _HomePageState extends State<HomePage> {
     return Scaffold(
       backgroundColor: Colors.grey[300],
       appBar: AppBar(
-        actions: [
-          IconButton(
-            onPressed: signOut,
-            icon: const Icon(
-              Icons.logout,
-              color: Colors.white,
-            ),
-          ),
-        ],
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.white),
         title: const Text(
           "The Wall",
           style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.grey[900],
+      ),
+      drawer: MyDrawer(
+        onLogoutTap: signOut,
+        onProfileTap: goToProfilePage,
       ),
       body: SafeArea(
         child: Center(
