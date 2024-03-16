@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "446201253291",
+    "project_id": "psyched-thunder-408118",
+    "storage_bucket": "psyched-thunder-408118.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:446201253291:android:1d72aeac6bd4231ac596ee",
+        "android_client_info": {
+          "package_name": "com.example.the_wall_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCuNKpifKezAIeSBsmkyI3aNwUL1g1hZc0"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

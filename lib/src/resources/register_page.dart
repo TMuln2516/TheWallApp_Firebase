@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:the_wall_app/src/components/button.dart';
@@ -31,9 +32,20 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     try {
-      await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: _mailController.text, password: _passController.text);
-      Navigator.pop(context);
+      UserCredential userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+              email: _mailController.text, password: _passController.text);
+
+      FirebaseFirestore.instance
+          .collection("User")
+          .doc(userCredential.user!.email)
+          .set(
+        {
+          'username': _mailController.text.split('@')[0],
+          'bio': '...',
+        },
+      );
+      // Navigator.pop(context);
     } on FirebaseAuthException catch (e) {
       Navigator.pop(context);
       displayMessage(e.code);
