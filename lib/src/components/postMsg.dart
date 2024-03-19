@@ -3,6 +3,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:the_wall_app/src/components/comment.dart';
 import 'package:the_wall_app/src/components/comment_button.dart';
+import 'package:the_wall_app/src/components/delete_button.dart';
 import 'package:the_wall_app/src/components/like_button.dart';
 import 'package:the_wall_app/src/helper/formatdata_helper.dart';
 
@@ -62,27 +63,81 @@ class _MyPostMsgState extends State<MyPostMsg> {
   //Add Comment
   void addCommnet(String commentText) {
     //Add in Firabae
-    setState(() {
-      FirebaseFirestore.instance
-          .collection("User Post")
-          .doc(widget.postID)
-          .collection("Comment")
-          .add(({
-            "CommentText": commentText,
-            "CommentBy": _currentUser.email,
-            "CommentTime": Timestamp.now()
-          }));
-    });
+    FirebaseFirestore.instance
+        .collection("User Post")
+        .doc(widget.postID)
+        .collection("Comment")
+        .add(({
+          "CommentText": commentText,
+          "CommentBy": _currentUser.email,
+          "CommentTime": Timestamp.now()
+        }));
+  }
+
+  void deletePost() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: Colors.grey[900],
+        title: const Text(
+          "Detele Post",
+          style: TextStyle(color: Colors.white),
+        ),
+        content: const Text(
+          "Are you sure Delete this Post?",
+          style: TextStyle(color: Colors.white),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("Cancel", style: TextStyle(color: Colors.white)),
+          ),
+          TextButton(
+            onPressed: () async {
+              final commentDocs = await FirebaseFirestore.instance
+                  .collection("User Post")
+                  .doc(widget.postID)
+                  .collection("Comment")
+                  .get();
+
+              for (var doc in commentDocs.docs) {
+                await FirebaseFirestore.instance
+                    .collection("User Post")
+                    .doc(widget.postID)
+                    .collection("Comment")
+                    .doc(doc.id)
+                    .delete();
+              }
+              await FirebaseFirestore.instance
+                  .collection("User Post")
+                  .doc(widget.postID)
+                  .delete()
+                  .then((value) => print("Post Deleted"))
+                  .catchError((e) => print(e.toString()));
+
+              Navigator.pop(context);
+            },
+            child: const Text("OK", style: TextStyle(color: Colors.white)),
+          ),
+        ],
+      ),
+    );
   }
 
   void showCommentDialog() {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Add Comment"),
+        backgroundColor: Colors.grey[900],
+        title: const Text(
+          "Add Comment",
+          style: TextStyle(color: Colors.white),
+        ),
         content: TextField(
           controller: _commentTextController,
-          decoration: const InputDecoration(hintText: "Write your comment..."),
+          decoration: InputDecoration(
+              hintText: "Write your comment...",
+              hintStyle: TextStyle(color: Colors.grey[800])),
         ),
         actions: [
           TextButton(
@@ -90,7 +145,10 @@ class _MyPostMsgState extends State<MyPostMsg> {
               Navigator.pop(context);
               _commentTextController.clear();
             },
-            child: const Text("Cancel"),
+            child: const Text(
+              "Cancel",
+              style: TextStyle(color: Colors.white),
+            ),
           ),
           TextButton(
               onPressed: () {
@@ -98,7 +156,10 @@ class _MyPostMsgState extends State<MyPostMsg> {
                 _commentTextController.clear();
                 Navigator.pop(context);
               },
-              child: const Text("Post"))
+              child: const Text(
+                "Post",
+                style: TextStyle(color: Colors.white),
+              ))
         ],
       ),
     );
@@ -112,7 +173,10 @@ class _MyPostMsgState extends State<MyPostMsg> {
       padding: const EdgeInsets.all(25),
       margin: const EdgeInsets.only(top: 25),
       child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
         children: [
+          if (widget.user == _currentUser.email)
+            MyDeleteButton(onTap: deletePost),
           Row(
             children: [
               Container(
@@ -193,6 +257,7 @@ class _MyPostMsgState extends State<MyPostMsg> {
                 .collection("User Post")
                 .doc(widget.postID)
                 .collection("Comment")
+                .orderBy("CommentTime", descending: true)
                 .snapshots(),
             builder: (context, snapshot) {
               if (!snapshot.hasData) {

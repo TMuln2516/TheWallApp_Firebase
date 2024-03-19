@@ -36,7 +36,9 @@ class MyDrawer extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(bottom: 10),
             child: MyListTileDrawer(
-                onTap: onLogoutTap, icon: Icons.home, text: "L O G O U T"),
+                onTap: onLogoutTap,
+                icon: Icons.exit_to_app_rounded,
+                text: "L O G O U T"),
           ),
         ],
       ),
